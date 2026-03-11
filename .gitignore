@@ -11,3 +11,4 @@ dumps
 .envrc.*
 Pulumi.*.yaml
 coverage.txt
+CLAUDE.md
