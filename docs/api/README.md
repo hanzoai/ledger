@@ -364,7 +364,7 @@ Idempotency-Key: string
         "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
         "expand": "string",
         "pit": "2019-08-24T14:15:22Z",
-        "sort": {},
+        "sort": "id:desc",
         "resource": "accounts"
       },
       "vars": {
@@ -387,7 +387,7 @@ Idempotency-Key: string
         "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
         "expand": "string",
         "pit": "2019-08-24T14:15:22Z",
-        "sort": {},
+        "sort": "id:desc",
         "resource": "accounts"
       },
       "vars": {
@@ -504,7 +504,7 @@ Accept: application/json
           "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
           "expand": "string",
           "pit": "2019-08-24T14:15:22Z",
-          "sort": {},
+          "sort": "id:desc",
           "resource": "accounts"
         },
         "vars": {
@@ -527,7 +527,7 @@ Accept: application/json
           "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
           "expand": "string",
           "pit": "2019-08-24T14:15:22Z",
-          "sort": {},
+          "sort": "id:desc",
           "resource": "accounts"
         },
         "vars": {
@@ -631,7 +631,7 @@ Accept: application/json
               "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
               "expand": "string",
               "pit": "2019-08-24T14:15:22Z",
-              "sort": {},
+              "sort": "id:desc",
               "resource": "accounts"
             },
             "vars": {
@@ -654,7 +654,7 @@ Accept: application/json
               "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
               "expand": "string",
               "pit": "2019-08-24T14:15:22Z",
-              "sort": {},
+              "sort": "id:desc",
               "resource": "accounts"
             },
             "vars": {
@@ -2561,14 +2561,24 @@ Accept: application/octet-stream
 
 > Example responses
 
+> 200 Response
+
 > default Response
+
+```json
+{
+  "errorCode": "VALIDATION",
+  "errorMessage": "[VALIDATION] invalid 'cursor' query param",
+  "details": "https://play.numscript.org/?payload=eyJlcnJvciI6ImFjY291bnQgaGFkIGluc3VmZmljaWVudCBmdW5kcyJ9"
+}
+```
 
 <h3 id="export-logs-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Import OK|None|
-|default|Default|Error|string|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Export OK|string|
+|default|Default|Error|[V2ErrorResponse](#schemav2errorresponse)|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -2603,7 +2613,7 @@ Run a query template on a ledger
     "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
     "expand": "string",
     "pit": "2019-08-24T14:15:22Z",
-    "sort": {},
+    "sort": "id:desc",
     "resource": "accounts"
   },
   "vars": {
@@ -2634,7 +2644,7 @@ Run a query template on a ledger
 |»» cursor|body|string|false|Parameter used in pagination requests. Maximum page size is set to 15.|
 |»» expand|body|string|false|none|
 |»» pit|body|string(date-time)|false|none|
-|»» sort|body|object|false|Sort results using a field name and order (ascending or descending).|
+|»» sort|body|string|false|Sort results using a field name and order (ascending or descending).|
 |»» *anonymous*|body|object|false|none|
 |»»» resource|body|string|false|none|
 |»» *anonymous*|body|object|false|none|
@@ -2845,20 +2855,10 @@ Accept: application/json
 ```json
 {
   "cursor": {
-    "cursor": {
-      "pageSize": 15,
-      "hasMore": false,
-      "previous": "YXVsdCBhbmQgYSBtYXhpbXVtIG1heF9yZXN1bHRzLol=",
-      "next": "aW0gdmVuaWFtLCBxdWlzIG5vc3RydWQ=",
-      "data": [
-        {
-          "driver": "string",
-          "config": {},
-          "id": "string",
-          "createdAt": "2019-08-24T14:15:22Z"
-        }
-      ]
-    },
+    "pageSize": 15,
+    "hasMore": false,
+    "previous": "YXVsdCBhbmQgYSBtYXhpbXVtIG1heF9yZXN1bHRzLol=",
+    "next": "aW0gdmVuaWFtLCBxdWlzIG5vc3RydWQ=",
     "data": [
       {
         "driver": "string",
@@ -2875,51 +2875,8 @@ Accept: application/json
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Exporters list|Inline|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Exporters list|[V2ExportersCursorResponse](#schemav2exporterscursorresponse)|
 |default|Default|Error|[V2ErrorResponse](#schemav2errorresponse)|
-
-<h3 id="list-exporters-responseschema">Response Schema</h3>
-
-Status Code **200**
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|» cursor|any|false|none|none|
-
-*allOf*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»» *anonymous*|[V2ExportersCursorResponse](#schemav2exporterscursorresponse)|false|none|none|
-|»»» cursor|object|true|none|none|
-|»»»» pageSize|integer(int64)|true|none|none|
-|»»»» hasMore|boolean|true|none|none|
-|»»»» previous|string|false|none|none|
-|»»»» next|string|false|none|none|
-|»»»» data|[allOf]|true|none|none|
-
-*allOf*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»»»»» *anonymous*|[V2ExporterConfiguration](#schemav2exporterconfiguration)|false|none|none|
-|»»»»»» driver|string|true|none|none|
-|»»»»»» config|object|true|none|none|
-
-*and*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»»»»» *anonymous*|object|false|none|none|
-|»»»»»» id|string|true|none|none|
-|»»»»»» createdAt|string(date-time)|true|none|none|
-
-*and*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»» *anonymous*|object|false|none|none|
-|»»» data|[allOf]|false|none|none|
 
 <aside class="success">
 This operation does not require authentication
@@ -3301,20 +3258,10 @@ Accept: application/json
 ```json
 {
   "cursor": {
-    "cursor": {
-      "pageSize": 15,
-      "hasMore": false,
-      "previous": "YXVsdCBhbmQgYSBtYXhpbXVtIG1heF9yZXN1bHRzLol=",
-      "next": "aW0gdmVuaWFtLCBxdWlzIG5vc3RydWQ=",
-      "data": [
-        {
-          "id": "string",
-          "createdAt": "2019-08-24T14:15:22Z",
-          "lastLogID": 0,
-          "enabled": true
-        }
-      ]
-    },
+    "pageSize": 15,
+    "hasMore": false,
+    "previous": "YXVsdCBhbmQgYSBtYXhpbXVtIG1heF9yZXN1bHRzLol=",
+    "next": "aW0gdmVuaWFtLCBxdWlzIG5vc3RydWQ=",
     "data": [
       {
         "id": "string",
@@ -3331,53 +3278,8 @@ Accept: application/json
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Pipelines list|Inline|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Pipelines list|[V2PipelinesCursorResponse](#schemav2pipelinescursorresponse)|
 |default|Default|Error|[V2ErrorResponse](#schemav2errorresponse)|
-
-<h3 id="list-pipelines-responseschema">Response Schema</h3>
-
-Status Code **200**
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|» cursor|any|false|none|none|
-
-*allOf*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»» *anonymous*|[V2PipelinesCursorResponse](#schemav2pipelinescursorresponse)|false|none|none|
-|»»» cursor|object|true|none|none|
-|»»»» pageSize|integer(int64)|true|none|none|
-|»»»» hasMore|boolean|true|none|none|
-|»»»» previous|string|false|none|none|
-|»»»» next|string|false|none|none|
-|»»»» data|[allOf]|true|none|none|
-
-*allOf*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»»»»» *anonymous*|object|false|none|none|
-|»»»»»» ledger|string|true|none|none|
-|»»»»»» exporterID|string|true|none|none|
-
-*and*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»»»»» *anonymous*|object|false|none|none|
-|»»»»»» id|string|true|none|none|
-|»»»»»» createdAt|string(date-time)|true|none|none|
-|»»»»»» lastLogID|integer|false|none|none|
-|»»»»»» enabled|boolean|false|none|none|
-
-*and*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|»» *anonymous*|object|false|none|none|
-|»»» data|[allOf]|false|none|none|
 
 <aside class="success">
 This operation does not require authentication
@@ -5014,7 +4916,7 @@ continued
           "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
           "expand": "string",
           "pit": "2019-08-24T14:15:22Z",
-          "sort": {},
+          "sort": "id:desc",
           "resource": "accounts"
         },
         "vars": {
@@ -5037,7 +4939,7 @@ continued
           "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
           "expand": "string",
           "pit": "2019-08-24T14:15:22Z",
-          "sort": {},
+          "sort": "id:desc",
           "resource": "accounts"
         },
         "vars": {
@@ -6862,7 +6764,7 @@ Transaction templates
   "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
   "expand": "string",
   "pit": "2019-08-24T14:15:22Z",
-  "sort": {},
+  "sort": "id:desc",
   "resource": "accounts"
 }
 
@@ -6876,7 +6778,7 @@ Transaction templates
 |cursor|string|false|none|Parameter used in pagination requests. Maximum page size is set to 15.<br>Set to the value of next for the next page of results.<br>Set to the value of previous for the previous page of results.<br>No other parameters can be set when this parameter is set.|
 |expand|string|false|none|none|
 |pit|string(date-time)|false|none|none|
-|sort|[#/components/parameters/sort](#schema#/components/parameters/sort)|false|none|Sort results using a field name and order (ascending or descending).<br>Format: `<field>:<order>`, where `<field>` is the field name and `<order>` is either `asc` or `desc`.|
+|sort|string|false|none|Sort results using a field name and order (ascending or descending).<br>Format: `<field>:<order>`, where `<field>` is the field name and `<order>` is either `asc` or `desc`.|
 
 oneOf
 
@@ -6933,7 +6835,7 @@ xor
     "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
     "expand": "string",
     "pit": "2019-08-24T14:15:22Z",
-    "sort": {},
+    "sort": "id:desc",
     "resource": "accounts"
   },
   "vars": {
@@ -6979,7 +6881,7 @@ xor
       "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
       "expand": "string",
       "pit": "2019-08-24T14:15:22Z",
-      "sort": {},
+      "sort": "id:desc",
       "resource": "accounts"
     },
     "vars": {
@@ -7002,7 +6904,7 @@ xor
       "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
       "expand": "string",
       "pit": "2019-08-24T14:15:22Z",
-      "sort": {},
+      "sort": "id:desc",
       "resource": "accounts"
     },
     "vars": {
@@ -7066,7 +6968,7 @@ Query templates
         "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
         "expand": "string",
         "pit": "2019-08-24T14:15:22Z",
-        "sort": {},
+        "sort": "id:desc",
         "resource": "accounts"
       },
       "vars": {
@@ -7089,7 +6991,7 @@ Query templates
         "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
         "expand": "string",
         "pit": "2019-08-24T14:15:22Z",
-        "sort": {},
+        "sort": "id:desc",
         "resource": "accounts"
       },
       "vars": {
@@ -7158,7 +7060,7 @@ Schema data structure for ledger schemas
         "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
         "expand": "string",
         "pit": "2019-08-24T14:15:22Z",
-        "sort": {},
+        "sort": "id:desc",
         "resource": "accounts"
       },
       "vars": {
@@ -7181,7 +7083,7 @@ Schema data structure for ledger schemas
         "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
         "expand": "string",
         "pit": "2019-08-24T14:15:22Z",
-        "sort": {},
+        "sort": "id:desc",
         "resource": "accounts"
       },
       "vars": {
@@ -7259,7 +7161,7 @@ and
           "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
           "expand": "string",
           "pit": "2019-08-24T14:15:22Z",
-          "sort": {},
+          "sort": "id:desc",
           "resource": "accounts"
         },
         "vars": {
@@ -7282,7 +7184,7 @@ and
           "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
           "expand": "string",
           "pit": "2019-08-24T14:15:22Z",
-          "sort": {},
+          "sort": "id:desc",
           "resource": "accounts"
         },
         "vars": {
@@ -7351,7 +7253,7 @@ and
               "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
               "expand": "string",
               "pit": "2019-08-24T14:15:22Z",
-              "sort": {},
+              "sort": "id:desc",
               "resource": "accounts"
             },
             "vars": {
@@ -7374,7 +7276,7 @@ and
               "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
               "expand": "string",
               "pit": "2019-08-24T14:15:22Z",
-              "sort": {},
+              "sort": "id:desc",
               "resource": "accounts"
             },
             "vars": {
@@ -7448,7 +7350,7 @@ and
             "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
             "expand": "string",
             "pit": "2019-08-24T14:15:22Z",
-            "sort": {},
+            "sort": "id:desc",
             "resource": "accounts"
           },
           "vars": {
@@ -7471,7 +7373,7 @@ and
             "cursor": "aHR0cHM6Ly9nLnBhZ2UvTmVrby1SYW1lbj9zaGFyZQ==",
             "expand": "string",
             "pit": "2019-08-24T14:15:22Z",
-            "sort": {},
+            "sort": "id:desc",
             "resource": "accounts"
           },
           "vars": {

@@ -48,7 +48,7 @@ var _ = Context("Pipelines API tests", func() {
 	BeforeEach(func(specContext SpecContext) {
 		for range countExporters {
 			// Create an exporter
-			exporter, err := Wait(specContext, DeferClient(testServer)).Ledger.V2.CreateExporter(ctx, components.V2ExporterConfiguration{
+			exporter, err := Wait(specContext, DeferClient(testServer)).Ledger.V2.CreateExporter(ctx, components.V2CreateExporterRequest{
 				Driver: "http",
 				Config: map[string]any{
 					"url": "http://localhost:8080",
@@ -82,6 +82,6 @@ var _ = Context("Pipelines API tests", func() {
 			Ledger: "default",
 		})
 		Expect(err).To(BeNil())
-		Expect(pipelines.V2ListPipelinesResponse.Cursor.Data).To(HaveLen(countExporters))
+		Expect(pipelines.V2PipelinesCursorResponse.Cursor.Data).To(HaveLen(countExporters))
 	})
 })

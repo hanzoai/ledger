@@ -1550,15 +1550,19 @@ paths:
             example: ledger001
       responses:
         "200":
-          description: Import OK
-        default:
-          description: Error
+          description: Export OK
           content:
             application/octet-stream:
               schema:
                 title: bytes
                 type: string
                 format: binary
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/V2ErrorResponse"
       security:
         - Authorization:
             - ledger:write
@@ -2064,16 +2068,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              cursor:
-                allOf:
-                  - $ref: "#/components/schemas/V2PipelinesCursorResponse"
-                  - properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/V2Pipeline"
+            $ref: "#/components/schemas/V2PipelinesCursorResponse"
 
     V2GetPipelineStateResponse:
       description: Pipeline information
@@ -2103,17 +2098,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              cursor:
-                allOf:
-                  - $ref: "#/components/schemas/V2ExportersCursorResponse"
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/V2Exporter"
+            $ref: "#/components/schemas/V2ExportersCursorResponse"
 
     V2GetExporterStateResponse:
       description: Exporter information
@@ -3205,7 +3190,11 @@ components:
           type: string
           format: date-time
         sort:
-          $ref: "#/components/parameters/sort"
+          type: string
+          description: |
+            Sort results using a field name and order (ascending or descending).
+            Format: `<field>:<order>`, where `<field>` is the field name and `<order>` is either `asc` or `desc`.
+          example: id:desc
       oneOf:
         - x-speakeasy-name-override: QueryTemplateAccountParams
           properties:
