@@ -11,29 +11,35 @@ type V2ListPipelinesRequest struct {
 	Ledger string `pathParam:"style=simple,explode=false,name=ledger"`
 }
 
-func (o *V2ListPipelinesRequest) GetLedger() string {
-	if o == nil {
+func (v *V2ListPipelinesRequest) GetLedger() string {
+	if v == nil {
 		return ""
 	}
-	return o.Ledger
+	return v.Ledger
 }
+
+// #region class-body-v2listpipelinesrequest
+// #endregion class-body-v2listpipelinesrequest
 
 type V2ListPipelinesResponse struct {
 	HTTPMeta components.HTTPMetadata `json:"-"`
 	// Pipelines list
-	V2ListPipelinesResponse *components.V2ListPipelinesResponse
+	V2PipelinesCursorResponse *components.V2PipelinesCursorResponse
 }
 
-func (o *V2ListPipelinesResponse) GetHTTPMeta() components.HTTPMetadata {
-	if o == nil {
+func (v *V2ListPipelinesResponse) GetHTTPMeta() components.HTTPMetadata {
+	if v == nil {
 		return components.HTTPMetadata{}
 	}
-	return o.HTTPMeta
+	return v.HTTPMeta
 }
 
-func (o *V2ListPipelinesResponse) GetV2ListPipelinesResponse() *components.V2ListPipelinesResponse {
-	if o == nil {
+func (v *V2ListPipelinesResponse) GetV2PipelinesCursorResponse() *components.V2PipelinesCursorResponse {
+	if v == nil {
 		return nil
 	}
-	return o.V2ListPipelinesResponse
+	return v.V2PipelinesCursorResponse
 }
+
+// #region class-body-v2listpipelinesresponse
+// #endregion class-body-v2listpipelinesresponse
