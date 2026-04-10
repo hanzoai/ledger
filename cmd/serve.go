@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/pprof"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -221,6 +222,30 @@ func assembleFinalRouter(
 			r = r.WithContext(logging.ContextWithLogger(r.Context(), logger))
 
 			handler.ServeHTTP(w, r)
+		})
+	})
+	// Canonical path rewrite: /v1/ledger/* -> /* (internal routes).
+	// This lets the service own its /<version>/<service>/<path> namespace
+	// while keeping all existing route registrations untouched.
+	wrappedRouter.Use(func(next http.Handler) http.Handler {
+		const prefix = "/v1/ledger"
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasPrefix(r.URL.Path, prefix) {
+				r2 := r.Clone(r.Context())
+				r2.URL.Path = r.URL.Path[len(prefix):]
+				if r2.URL.Path == "" {
+					r2.URL.Path = "/"
+				}
+				if r2.URL.RawPath != "" {
+					r2.URL.RawPath = r.URL.RawPath[len(prefix):]
+					if r2.URL.RawPath == "" {
+						r2.URL.RawPath = "/"
+					}
+				}
+				next.ServeHTTP(w, r2)
+				return
+			}
+			next.ServeHTTP(w, r)
 		})
 	})
 	wrappedRouter.Route("/_/", func(r chi.Router) {
