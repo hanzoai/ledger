@@ -92,9 +92,9 @@ func ExperimentalPipelinesSyncPeriodInstrumentation(duration time.Duration) test
 	}
 }
 
-func GRPCAddressInstrumentation(addr string) testservice.InstrumentationFunc {
+func ZAPAddressInstrumentation(addr string) testservice.InstrumentationFunc {
 	return func(ctx context.Context, runConfiguration *testservice.RunConfiguration) error {
-		runConfiguration.AppendArgs("--"+cmd.WorkerGRPCAddressFlag, addr)
+		runConfiguration.AppendArgs("--"+cmd.WorkerZAPAddressFlag, addr)
 		return nil
 	}
 }
@@ -105,7 +105,7 @@ func WorkerAddressInstrumentation(addr *deferred.Deferred[string]) testservice.I
 		if err != nil {
 			return fmt.Errorf("waiting for worker address: %w", err)
 		}
-		runConfiguration.AppendArgs("--"+cmd.WorkerGRPCAddressFlag, address)
+		runConfiguration.AppendArgs("--"+cmd.WorkerZAPAddressFlag, address)
 		return nil
 	}
 }

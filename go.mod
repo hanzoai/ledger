@@ -52,11 +52,11 @@ require (
 	github.com/formancehq/go-libs/v4 v4.0.0
 	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/iancoleman/strcase v0.3.0
+	github.com/luxfi/zap v0.2.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.20.1
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0
 	go.vallahaye.net/batcher v0.6.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -69,6 +69,7 @@ require (
 	github.com/antithesishq/antithesis-sdk-go v0.5.0-default-no-op // indirect
 	github.com/aws/aws-sdk-go-v2/service/sns v1.37.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.42.4 // indirect
+	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
@@ -78,10 +79,13 @@ require (
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/google/go-tpm v0.9.8 // indirect
+	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6 // indirect
 	github.com/jackc/pgxlisten v0.0.0-20250802141604-12b92425684c // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/luxfi/mdns v0.1.0 // indirect
+	github.com/miekg/dns v1.1.62 // indirect
 	github.com/moby/moby/api v1.53.0 // indirect
 	github.com/moby/moby/client v0.2.2 // indirect
 	github.com/moby/sys/user v0.4.0 // indirect
@@ -244,6 +248,6 @@ require (
 	golang.org/x/tools v0.42.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
-	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.8
+	google.golang.org/grpc v1.74.2 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 )

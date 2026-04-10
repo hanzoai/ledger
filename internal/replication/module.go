@@ -5,13 +5,12 @@ import (
 	"time"
 
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
 
 	"github.com/formancehq/go-libs/v4/logging"
 
 	"github.com/formancehq/ledger/internal/controller/system"
 	"github.com/formancehq/ledger/internal/replication/drivers"
-	innergrpc "github.com/formancehq/ledger/internal/replication/grpc"
+	"github.com/formancehq/ledger/internal/replication/rpc"
 )
 
 type WorkerModuleConfig struct {
@@ -67,7 +66,7 @@ func NewWorkerFXModule(cfg WorkerModuleConfig) fx.Option {
 			drivers.NewWithBatchingDriverFactory,
 			fx.As(new(drivers.Factory)),
 		)),
-		fx.Provide(fx.Annotate(NewReplicationServiceImpl, fx.As(new(innergrpc.ReplicationServer)))),
+		fx.Provide(fx.Annotate(NewReplicationServiceImpl, fx.As(new(rpc.ReplicationHandler)))),
 		fx.Provide(func(driversRegistry *drivers.Registry) ConfigValidator {
 			return driversRegistry
 		}),
@@ -85,12 +84,9 @@ func NewWorkerFXModule(cfg WorkerModuleConfig) fx.Option {
 	)
 }
 
-func NewFXGRPCClientModule() fx.Option {
+func NewFXRPCClientModule() fx.Option {
 	return fx.Options(
-		fx.Provide(func(conn *grpc.ClientConn) innergrpc.ReplicationClient {
-			return innergrpc.NewReplicationClient(conn)
-		}),
-		fx.Provide(fx.Annotate(NewThroughGRPCBackend, fx.As(new(system.ReplicationBackend)))),
+		fx.Provide(fx.Annotate(NewThroughRPCBackend, fx.As(new(system.ReplicationBackend)))),
 	)
 }
 

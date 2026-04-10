@@ -1,24 +1,18 @@
 package worker
 
 import (
-	"fmt"
+	"context"
+	"log/slog"
 
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
-
-	"github.com/formancehq/go-libs/v4/grpcserver"
-	"github.com/formancehq/go-libs/v4/serverport"
 
 	"github.com/formancehq/ledger/internal/replication"
-	innergrpc "github.com/formancehq/ledger/internal/replication/grpc"
+	"github.com/formancehq/ledger/internal/replication/rpc"
 	"github.com/formancehq/ledger/internal/storage"
 )
 
-type GRPCServerModuleConfig struct {
-	Address       string
-	ServerOptions []grpc.ServerOption
+type ZAPServerModuleConfig struct {
+	Address string
 }
 
 type ModuleConfig struct {
@@ -29,48 +23,48 @@ type ModuleConfig struct {
 
 // NewFXModule constructs an fx.Option that installs the storage async block runner,
 // the replication worker, and the bucket cleanup runner modules into an Fx application.
-// The provided cfg supplies each submodule's configuration.
 func NewFXModule(cfg ModuleConfig) fx.Option {
 	return fx.Options(
-		// todo: add auto discovery
 		storage.NewAsyncBlockRunnerModule(cfg.AsyncBlockRunnerConfig),
 		replication.NewWorkerFXModule(cfg.ReplicationConfig),
 		storage.NewBucketCleanupRunnerModule(cfg.BucketCleanupRunnerConfig),
 	)
 }
 
-func NewGRPCServerFXModule(cfg GRPCServerModuleConfig) fx.Option {
+// NewZAPServerFXModule creates an fx module that starts a ZAP-based replication server.
+func NewZAPServerFXModule(cfg ZAPServerModuleConfig) fx.Option {
 	return fx.Options(
-		fx.Invoke(func(lc fx.Lifecycle, replicationServer innergrpc.ReplicationServer, traceProvider trace.TracerProvider) {
-			lc.Append(grpcserver.NewHook(
-				grpcserver.WithServerPortOptions(
-					serverport.WithAddress(cfg.Address),
-				),
-				grpcserver.WithGRPCSetupOptions(func(server *grpc.Server) {
-					innergrpc.RegisterReplicationServer(server, replicationServer)
-				}),
-				grpcserver.WithGRPCServerOptions(
-					grpc.StatsHandler(otelgrpc.NewServerHandler(otelgrpc.WithTracerProvider(traceProvider))),
-				),
-			))
+		fx.Provide(func(handler rpc.ReplicationHandler) (*rpc.Server, error) {
+			return rpc.NewServer(cfg.Address, handler, slog.Default())
+		}),
+		fx.Invoke(func(lc fx.Lifecycle, server *rpc.Server) {
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					return server.Start()
+				},
+				OnStop: func(ctx context.Context) error {
+					server.Stop()
+					return nil
+				},
+			})
 		}),
 	)
 }
 
-func NewGRPCClientFxModule(
-	address string,
-	options ...grpc.DialOption,
-) fx.Option {
+// NewZAPClientFxModule creates an fx module that connects a ZAP client to the worker.
+func NewZAPClientFxModule(address string) fx.Option {
 	return fx.Options(
-		fx.Provide(func(tracerProvider trace.TracerProvider) (*grpc.ClientConn, error) {
-			client, err := grpc.NewClient(address, append(
-				options,
-				grpc.WithStatsHandler(otelgrpc.NewClientHandler(otelgrpc.WithTracerProvider(tracerProvider))),
-			)...)
+		fx.Provide(func(lc fx.Lifecycle) (*rpc.Client, error) {
+			client, err := rpc.NewClient(address, slog.Default())
 			if err != nil {
-				return nil, fmt.Errorf("failed to dial: %v", err)
+				return nil, err
 			}
-
+			lc.Append(fx.Hook{
+				OnStop: func(ctx context.Context) error {
+					client.Stop()
+					return nil
+				},
+			})
 			return client, nil
 		}),
 	)

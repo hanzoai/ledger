@@ -11,8 +11,6 @@ import (
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	apilib "github.com/formancehq/go-libs/v4/api"
 	"github.com/formancehq/go-libs/v4/auth"
@@ -55,7 +53,7 @@ type ServeCommandConfig struct {
 	DefaultPageSize        uint64 `mapstructure:"default-page-size"`
 	MaxPageSize            uint64 `mapstructure:"max-page-size"`
 	WorkerEnabled          bool   `mapstructure:"worker"`
-	WorkerAddress          string `mapstructure:"worker-grpc-address"`
+	WorkerAddress          string `mapstructure:"worker-zap-address"`
 }
 
 const (
@@ -166,11 +164,8 @@ func NewServeCommand() *cobra.Command {
 				)
 			} else {
 				options = append(options,
-					worker.NewGRPCClientFxModule(
-						cfg.WorkerAddress,
-						grpc.WithTransportCredentials(insecure.NewCredentials()),
-					),
-					replication.NewFXGRPCClientModule(),
+					worker.NewZAPClientFxModule(cfg.WorkerAddress),
+					replication.NewFXRPCClientModule(),
 				)
 			}
 
@@ -189,7 +184,7 @@ func NewServeCommand() *cobra.Command {
 	cmd.Flags().Bool(ExperimentalFeaturesFlag, false, "Enable features configurability")
 	cmd.Flags().Bool(NumscriptInterpreterFlag, false, "Enable experimental numscript rewrite")
 	cmd.Flags().StringSlice(NumscriptInterpreterFlagsToPass, nil, "Feature flags to pass to the experimental numscript interpreter")
-	cmd.Flags().String(WorkerGRPCAddressFlag, "localhost:8081", "GRPC address")
+	cmd.Flags().String(WorkerZAPAddressFlag, "localhost:8081", "Worker ZAP RPC address")
 	cmd.Flags().Bool(SemconvMetricsNames, false, "Use semconv metrics names (recommended)")
 	cmd.Flags().String(SchemaEnforcementMode, "audit", "Schema enforcement mode. Values: `audit`, `strict`")
 

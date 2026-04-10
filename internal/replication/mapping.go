@@ -3,100 +3,80 @@ package replication
 import (
 	"encoding/json"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/formancehq/go-libs/v4/bun/bunpaginate"
 	"github.com/formancehq/go-libs/v4/time"
 
 	ledger "github.com/formancehq/ledger/internal"
-	"github.com/formancehq/ledger/internal/replication/grpc"
+	"github.com/formancehq/ledger/internal/replication/rpc"
 )
 
-func mapExporter(exporter ledger.Exporter) *grpc.Exporter {
-	return &grpc.Exporter{
-		Id: exporter.ID,
-		CreatedAt: &timestamppb.Timestamp{
-			Seconds: exporter.CreatedAt.Unix(),
-			Nanos:   int32(exporter.CreatedAt.Nanosecond()),
+func mapExporterToRPC(exporter ledger.Exporter) rpc.Exporter {
+	return rpc.Exporter{
+		ID:        exporter.ID,
+		CreatedAt: exporter.CreatedAt.Time,
+		Config:    mapExporterConfigToRPC(exporter.ExporterConfiguration),
+	}
+}
+
+func mapExporterFromRPC(exporter rpc.Exporter) ledger.Exporter {
+	return ledger.Exporter{
+		ID:        exporter.ID,
+		CreatedAt: time.New(exporter.CreatedAt),
+		ExporterConfiguration: ledger.ExporterConfiguration{
+			Driver: exporter.Config.Driver,
+			Config: json.RawMessage(exporter.Config.Config),
 		},
-		Config: mapExporterConfiguration(exporter.ExporterConfiguration),
 	}
 }
 
-func mapPipelineConfiguration(cfg ledger.PipelineConfiguration) *grpc.PipelineConfiguration {
-	return &grpc.PipelineConfiguration{
-		ExporterId: cfg.ExporterID,
-		Ledger:     cfg.Ledger,
+func mapExporterConfigToRPC(cfg ledger.ExporterConfiguration) rpc.ExporterConfiguration {
+	return rpc.ExporterConfiguration{
+		Driver: cfg.Driver,
+		Config: string(cfg.Config),
 	}
 }
 
-func mapPipelineConfigurationFromGRPC(cfg *grpc.PipelineConfiguration) ledger.PipelineConfiguration {
-	return ledger.PipelineConfiguration{
-		ExporterID: cfg.ExporterId,
-		Ledger:     cfg.Ledger,
-	}
-}
-
-func mapPipeline(pipeline ledger.Pipeline) *grpc.Pipeline {
-	return &grpc.Pipeline{
-		Config: mapPipelineConfiguration(pipeline.PipelineConfiguration),
-		CreatedAt: &timestamppb.Timestamp{
-			Seconds: pipeline.CreatedAt.Unix(),
-			Nanos:   int32(pipeline.CreatedAt.Nanosecond()),
+func mapPipelineToRPC(pipeline ledger.Pipeline) rpc.Pipeline {
+	return rpc.Pipeline{
+		Config: rpc.PipelineConfiguration{
+			ExporterID: pipeline.ExporterID,
+			Ledger:     pipeline.Ledger,
 		},
-		Id:        pipeline.ID,
+		CreatedAt: pipeline.CreatedAt.Time,
+		ID:        pipeline.ID,
 		Enabled:   pipeline.Enabled,
 		LastLogID: pipeline.LastLogID,
 		Error:     pipeline.Error,
 	}
 }
 
-func mapPipelineFromGRPC(pipeline *grpc.Pipeline) ledger.Pipeline {
+func mapPipelineFromRPC(pipeline rpc.Pipeline) ledger.Pipeline {
 	return ledger.Pipeline{
-		PipelineConfiguration: mapPipelineConfigurationFromGRPC(pipeline.Config),
-		CreatedAt:             time.New(pipeline.CreatedAt.AsTime()),
-		ID:                    pipeline.Id,
-		Enabled:               pipeline.Enabled,
-		LastLogID:             pipeline.LastLogID,
-		Error:                 pipeline.Error,
+		PipelineConfiguration: ledger.PipelineConfiguration{
+			ExporterID: pipeline.Config.ExporterID,
+			Ledger:     pipeline.Config.Ledger,
+		},
+		CreatedAt: time.New(pipeline.CreatedAt),
+		ID:        pipeline.ID,
+		Enabled:   pipeline.Enabled,
+		LastLogID: pipeline.LastLogID,
+		Error:     pipeline.Error,
 	}
 }
 
-func mapCursor[V any](ret *bunpaginate.Cursor[V]) *grpc.Cursor {
-	return &grpc.Cursor{
+func mapCursorToRPC[V any](ret *bunpaginate.Cursor[V]) rpc.Cursor {
+	return rpc.Cursor{
 		Next:    ret.Next,
 		HasMore: ret.HasMore,
 		Prev:    ret.Previous,
 	}
 }
 
-func mapCursorFromGRPC[V any](ret *grpc.Cursor, data []V) *bunpaginate.Cursor[V] {
+func mapCursorFromRPC[V any](ret rpc.Cursor, data []V) *bunpaginate.Cursor[V] {
 	return &bunpaginate.Cursor[V]{
 		Next:     ret.Next,
 		HasMore:  ret.HasMore,
 		Previous: ret.Prev,
 		Data:     data,
-	}
-}
-
-func mapExporterFromGRPC(exporter *grpc.Exporter) ledger.Exporter {
-	return ledger.Exporter{
-		ID:                    exporter.Id,
-		CreatedAt:             time.New(exporter.CreatedAt.AsTime()),
-		ExporterConfiguration: mapExporterConfigurationFromGRPC(exporter.Config),
-	}
-}
-
-func mapExporterConfigurationFromGRPC(from *grpc.ExporterConfiguration) ledger.ExporterConfiguration {
-	return ledger.ExporterConfiguration{
-		Driver: from.Driver,
-		Config: json.RawMessage(from.Config),
-	}
-}
-
-func mapExporterConfiguration(configuration ledger.ExporterConfiguration) *grpc.ExporterConfiguration {
-	return &grpc.ExporterConfiguration{
-		Driver: configuration.Driver,
-		Config: string(configuration.Config),
 	}
 }

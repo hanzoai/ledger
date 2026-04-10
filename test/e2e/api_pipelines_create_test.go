@@ -13,7 +13,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/formancehq/go-libs/v4/grpcserver"
 	"github.com/formancehq/go-libs/v4/logging"
 	"github.com/formancehq/go-libs/v4/testing/deferred"
 	. "github.com/formancehq/go-libs/v4/testing/deferred/ginkgo"
@@ -96,7 +95,7 @@ var _ = Context("Pipelines API tests", func() {
 	Context("With a single instance, and worker on a separate process", func() {
 		connectionOptions := DeferMap(db, (*pgtesting.Database).ConnectionOptions)
 
-		worker := DeferTestWorker(
+		_, workerAddr := DeferTestWorkerWithAddr(
 			connectionOptions,
 			testservice.WithInstruments(
 				testservice.DebugInstrumentation(debug),
@@ -117,9 +116,7 @@ var _ = Context("Pipelines API tests", func() {
 				testservice.OutputInstrumentation(GinkgoWriter),
 				ExperimentalFeaturesInstrumentation(),
 				ExperimentalExportersInstrumentation(),
-				WorkerAddressInstrumentation(DeferMap(worker, func(from *testservice.Service) string {
-					return grpcserver.Address(from.GetContext())
-				})),
+				ZAPAddressInstrumentation(workerAddr),
 			),
 			testservice.WithLogger(GinkgoT()),
 		)
